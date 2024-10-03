@@ -17,3 +17,6 @@ spec:
         image: 167865939934.dkr.ecr.ap-south-1.amazonaws.com/node_app:2
         ports: 
         - containerPort: 5000
+
+      imagePullSecrets:
+       - name: ECR_Credentials
