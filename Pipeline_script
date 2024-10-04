@@ -1,0 +1,43 @@
+pipeline{
+    agent any
+    stages{
+        stage(checkout_repo){
+            steps{
+                git 'https://github.com/adarsh1525/node-js-sample.git'
+            }
+        }
+        stage(Docker_build){
+               steps { 
+                    script {
+                      def node_app = 'my-node-app'  // Declare the Docker image name
+                      dockerImage = docker.build("adarsh1525/node_app:${env.BUILD_ID}", '.')
+                      withCredentials([usernamePassword(credentialsId: 'Adarsh_docker_hub', passwordVariable: 'docker_password', usernameVariable: 'docker_username')]) {
+                         sh "docker login -u $docker_username -p $docker_password"
+                         sh "docker push adarsh1525/node_app:${env.BUILD_ID}"
+                       }
+                    }
+               }
+        }
+        stage(Kubectl_deploy_app){
+            steps{
+                script{
+                  sh 'kubectl apply -f deployment.yaml'
+                }
+            }
+        }
+        stage(Kubectl_service){
+            steps{
+                script{
+                  sh 'kubectl apply -f service.yaml'
+                }
+            }
+        }
+        stage(Expose_service){
+            steps{
+                    sh """
+                    kubectl port-forward --address 0.0.0.0 svc/nodejs-app 5000:5000
+                    """
+            }
+        }
+    }
+}
