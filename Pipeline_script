@@ -1,11 +1,11 @@
 pipeline{
     agent any
     stages{
-        stage(checkout_repo){
+       /* stage(checkout_repo){
             steps{
                 git 'https://github.com/adarsh1525/node-js-sample.git'
             }
-        }
+        } */
         stage(Docker_build){
                steps { 
                     script {
